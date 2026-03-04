@@ -43,6 +43,23 @@
 		component: './TodoList',
 	},
 	{
+		path: '/bai-thuc-hanh',
+		name: 'BaiThucHanh',
+		icon: 'ExperimentOutlined',
+		routes: [
+			{
+				path: '/bai-thuc-hanh/doan-so',
+				name: 'DoanSo',
+				component: './BaiThucHanh/DoanSo',
+			},
+			{
+				path: '/bai-thuc-hanh/quan-ly-hoc-tap',
+				name: 'QuanLyHocTap',
+				component: './BaiThucHanh/QuanLyHocTap',
+			},
+		],
+	},
+	{
 		path: '/quan-ly-san-pham',
 		name: 'QuanLySanPham',
 		icon: 'AppstoreOutlined',
@@ -87,6 +104,7 @@
 	},
 	{
 		path: '/',
+		redirect: '/dashboard',
 	},
 	{
 		path: '/403',

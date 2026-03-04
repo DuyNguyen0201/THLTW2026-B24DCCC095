@@ -715,7 +715,9 @@ const QuanLySanPham: React.FC = () => {
 							style={{ width: '100%' }}
 							min={1}
 							formatter={(value) => `${value ?? ''}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-							parser={(value) => parseInt((value ?? '').replace(/[^\d]/g, ''), 10) || 1}
+							parser={(value?: string) =>
+                                value ? Number(value.replace(/,/g, '')) : 1
+                              }
 							placeholder='Nhập giá sản phẩm'
 						/>
 					</Form.Item>
