@@ -12,4 +12,8 @@ export default {
 
 	'menu.DanhMuc': 'Danh mục',
 	'menu.DanhMuc.ChucVu': 'Chức vụ',
+
+	'menu.ThucHanh02': 'Thực hành 02',
+	'menu.ThucHanh02.Bai1': 'Bài 1 - Oẳn Tù Tì',
+	'menu.ThucHanh02.Bai2': 'Bài 2 - Ngân hàng câu hỏi',
 };

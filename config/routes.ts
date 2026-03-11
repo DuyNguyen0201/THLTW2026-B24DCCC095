@@ -48,6 +48,10 @@
 		icon: 'ExperimentOutlined',
 		routes: [
 			{
+				path: '/bai-thuc-hanh',
+				redirect: '/bai-thuc-hanh/doan-so',
+			},
+			{
 				path: '/bai-thuc-hanh/doan-so',
 				name: 'DoanSo',
 				component: './BaiThucHanh/DoanSo',
@@ -79,6 +83,24 @@
 	// 		},
 	// 	],
 	// },
+
+	{
+		name: 'ThucHanh02',
+		path: '/thuc-hanh-02',
+		icon: 'BookOutlined',
+		routes: [
+			{
+				name: 'ThucHanh02.Bai1',
+				path: 'oan-tu-ti',
+				component: './ThucHanh02/OanTuTi',
+			},
+			{
+				name: 'ThucHanh02.Bai2',
+				path: 'quan-ly-ngan-hang-cau-hoi',
+				component: './ThucHanh02/QuanLyNganHangCauHoi',
+			},
+		],
+	},
 
 	{
 		path: '/notification',

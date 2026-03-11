@@ -11,4 +11,9 @@ export default {
   'menu.DanhMuc': 'Danh mục',
   'menu.DanhMuc.ChucVu': 'Chức vụ',
   'menu.DanhMuc.LoaiPhongBan': 'Loại phòng ban',
+
+
+  'menu.ThucHanh02': 'Practice 02',
+  'menu.ThucHanh02.Bai1': 'Exercise 1 - Rock Paper Scissors',
+  'menu.ThucHanh02.Bai2': 'Exercise 2 - Essay Question Bank',
 };
