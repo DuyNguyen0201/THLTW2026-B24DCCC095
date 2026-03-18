@@ -16,4 +16,5 @@ export default {
 	'menu.ThucHanh02': 'Thực hành 02',
 	'menu.ThucHanh02.Bai1': 'Bài 1 - Oẳn Tù Tì',
 	'menu.ThucHanh02.Bai2': 'Bài 2 - Ngân hàng câu hỏi',
+	'menu.Practice03': 'Thực hành 03',
 };

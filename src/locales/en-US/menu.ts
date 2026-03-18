@@ -16,4 +16,5 @@ export default {
   'menu.ThucHanh02': 'Practice 02',
   'menu.ThucHanh02.Bai1': 'Exercise 1 - Rock Paper Scissors',
   'menu.ThucHanh02.Bai2': 'Exercise 2 - Essay Question Bank',
+  'menu.Practice03': 'Thực hành 03',
 };

@@ -43,6 +43,12 @@
 		component: './TodoList',
 	},
 	{
+		path: '/thuc-hanh-03',
+		name: 'Practice03',
+		icon: 'CalendarOutlined',
+		component: './DatLichHen',
+	},
+	{
 		path: '/bai-thuc-hanh',
 		name: 'BaiThucHanh',
 		icon: 'ExperimentOutlined',
