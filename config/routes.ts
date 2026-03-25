@@ -37,6 +37,12 @@
 		icon: 'ArrowsAltOutlined',
 	},
 	{
+		path: '/van-bang',
+		name: 'VanBang',
+		icon: 'BookOutlined',
+		component: './VanBang',
+	},
+	{
 		path: '/todo-list',
 		name: 'TodoList',
 		icon: 'OrderedListOutlined',
