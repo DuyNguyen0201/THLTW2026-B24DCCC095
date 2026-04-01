@@ -5,7 +5,9 @@ export default {
 	'menu.Dashboard': 'Trang chủ',
 	'menu.About': `Giới thiệu ${APP_CONFIG_TIEN_TO_TRUONG.toLowerCase()}`,
 	'menu.News': 'Tin tức',
-	'menu.ThucHanh04': 'Quản lý văn bằng',
+	'menu.Practice05': 'Thực hành 05 - CLB',
+
+	'menu.VanBang': 'Quản lý văn bằng',
 	'menu.BaiThucHanh': 'Bài thực hành',
 	'menu.BaiThucHanh.DoanSo': 'Bài 1 - Đoán số',
 	'menu.BaiThucHanh.QuanLyHocTap': 'Bài 2 - Quản lý học tập',

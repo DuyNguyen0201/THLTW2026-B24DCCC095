@@ -81,6 +81,12 @@
 		icon: 'AppstoreOutlined',
 		component: './QuanLySanPham',
 	},
+	{
+		path: '/thuc-hanh-05',
+		name: 'Practice05',
+		icon: 'TeamOutlined',
+		component: './ThucHanh05',
+	},
 
 	// DANH MUC HE THONG
 	// {

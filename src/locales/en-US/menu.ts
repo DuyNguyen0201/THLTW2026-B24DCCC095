@@ -4,6 +4,8 @@ export default {
   'menu.account.center': 'Cá nhân',
   'menu.Dashboard': 'Trang chủ',
   'menu.News': 'Tin tức',
+  'menu.Practice05': 'Practice 05 - Club',
+  'menu.VanBang': 'Diploma Registry',
   'menu.BaiThucHanh': 'Bài thực hành',
   'menu.BaiThucHanh.DoanSo': 'Bài 1 - Đoán số',
   'menu.BaiThucHanh.QuanLyHocTap': 'Bài 2 - Quản lý học tập',
