@@ -14,6 +14,7 @@ export default {
   'menu.DanhMuc.ChucVu': 'Chức vụ',
   'menu.DanhMuc.LoaiPhongBan': 'Loại phòng ban',
 
+  'menu.TravelPlanner': 'Travel Planner',
 
   'menu.ThucHanh02': 'Practice 02',
   'menu.ThucHanh02.Bai1': 'Exercise 1 - Rock Paper Scissors',

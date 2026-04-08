@@ -87,6 +87,12 @@
 		icon: 'TeamOutlined',
 		component: './ThucHanh05',
 	},
+	{
+		path: '/travel-planner',
+		name: 'TravelPlanner',
+		icon: 'CompassOutlined',
+		component: './TravelPlanner',
+	},
 
 	// DANH MUC HE THONG
 	// {

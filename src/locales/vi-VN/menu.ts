@@ -6,6 +6,7 @@ export default {
 	'menu.About': `Giới thiệu ${APP_CONFIG_TIEN_TO_TRUONG.toLowerCase()}`,
 	'menu.News': 'Tin tức',
 	'menu.Practice05': 'Thực hành 05 - CLB',
+	'menu.TravelPlanner': 'Lập kế hoạch du lịch',
 
 	'menu.VanBang': 'Quản lý văn bằng',
 	'menu.BaiThucHanh': 'Bài thực hành',
