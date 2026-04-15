@@ -93,6 +93,13 @@
 		icon: 'CompassOutlined',
 		component: './TravelPlanner',
 	},
+	{
+        path: '/KTGK/quan-ly-phong-hoc',
+        name: 'Quản Lý phòng học',
+        icon: 'TeamOutlined',
+        component: './QuanLyPhongHoc',
+    },
+
 
 	// DANH MUC HE THONG
 	// {
