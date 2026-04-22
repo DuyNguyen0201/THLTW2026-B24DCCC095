@@ -94,12 +94,17 @@
 		component: './TravelPlanner',
 	},
 	{
-        path: '/KTGK/quan-ly-phong-hoc',
-        name: 'Quản Lý phòng học',
-        icon: 'TeamOutlined',
-        component: './QuanLyPhongHoc',
-    },
-
+		path: '/phong-hoc',
+		name: 'Quản lý phòng học',
+		icon: 'BankOutlined',
+		component: './QuanLyPhongHoc',
+	},
+	{
+		path: '/blog-ca-nhan',
+		name: 'BlogCaNhan',
+		icon: 'ReadOutlined',
+		component: './BlogCaNhan',  // ← Sửa thành tên folder mới
+	},
 
 	// DANH MUC HE THONG
 	// {
