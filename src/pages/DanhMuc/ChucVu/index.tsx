@@ -4,7 +4,7 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Button, Popconfirm, Tooltip } from 'antd';
 import moment from 'moment';
 import { useModel } from 'umi';
-import Form from './components/Form';
+
 
 const ChucVuPage = () => {
   const { getModel, page, limit, deleteModel, handleEdit } = useModel('danhmuc.chucvu');
@@ -64,7 +64,7 @@ const ChucVuPage = () => {
       dependencies={[page, limit]}
       modelName="danhmuc.chucvu"
       title="Chức vụ"
-      Form={Form}
+     
       buttons={{ import: true }}
     />
   );

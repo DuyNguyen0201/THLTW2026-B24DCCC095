@@ -1,489 +1,283 @@
-import React, { useState, useMemo } from 'react';
-import { PageContainer, ProTable, ProColumns } from '@ant-design/pro-components';
-import { 
-  Button, Popconfirm, message, Tooltip, Modal, Form, Input, Select, InputNumber, 
-  Tag, Badge, Row, Col, Card, Space, Empty, Divider 
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Popconfirm,
+  Select,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+  message,
 } from 'antd';
-import { 
-  PlusOutlined, DeleteOutlined, EditOutlined, DownloadOutlined,
-  HomeOutlined 
-} from '@ant-design/icons';
-import { PhongHoc, initialData, loaiPhongEnum, danhSachNguoiPhuTrach } from './data';
+import { useMemo, useState } from 'react';
+import {
+  INITIAL_CLASSROOMS,
+  RESPONSIBLES,
+  ROOM_TYPE_LABEL,
+  ROOM_TYPE_OPTIONS,
+  type Classroom,
+  type RoomType,
+} from './data';
 
-const QuanLyPhongHoc: React.FC = () => {
-  const [dataSource, setDataSource] = useState<PhongHoc[]>(initialData);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentRow, setCurrentRow] = useState<PhongHoc | undefined>(undefined);
-  const [form] = Form.useForm();
-  const [searchForm] = Form.useForm();
-  const [searchParams, setSearchParams] = useState<{
-    maPhong?: string;
-    tenPhong?: string;
-    loaiPhong?: string;
-    nguoiPhuTrach?: string;
-  }>({});
+type FormValues = Omit<Classroom, 'id'>;
 
-  const handleOpenModal = (record?: PhongHoc) => {
-    setCurrentRow(record);
-    if (record) {//
-      form.setFieldsValue(record);  
-    } else {
-      form.resetFields(); 
-    }
-    setIsModalVisible(true);
-  };
+const PhongHocPage = () => {
+  const [form] = Form.useForm<FormValues>();
+  const [data, setData] = useState<Classroom[]>(INITIAL_CLASSROOMS);
+  const [visible, setVisible] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-  const handleDelete = (id: string) => {
-    setDataSource(dataSource.filter((item) => item.id !== id));
-    message.success('Đã xóa phòng học thành công');
-  };
-
-  const handleFinish = (values: any) => {
-    const trimmedValues = {
-      ...values,
-      maPhong: values.maPhong?.trim() || '',
-      tenPhong: values.tenPhong?.trim() || '',
-    };
-
-    if (currentRow) {
-      setDataSource(dataSource.map((item) => (item.id === currentRow.id ? { ...item, ...trimmedValues } : item)));
-      message.success('Cập nhật phòng học thành công!');
-    } else {
-      setDataSource([...dataSource, { ...trimmedValues, id: Date.now().toString() }]);
-      message.success('Thêm mới phòng học thành công!');
-    }
-    setIsModalVisible(false);
-  };
-
-  const checkTrungLap = (_: any, value: string, field: 'maPhong' | 'tenPhong') => {
-    if (!value) return Promise.resolve();
-    const isExist = dataSource.some(
-      (item) => item[field].toLowerCase() === value.toLowerCase() && item.id !== currentRow?.id
-    );
-    if (isExist) {
-      return Promise.reject(new Error(${field === 'maPhong' ? 'Mã phòng' : 'Tên phòng'} đã tồn tại!));
-    }
-    return Promise.resolve();
-  };
-
-  const handleSearch = () => {
-    const values = searchForm.getFieldsValue();
-    setSearchParams({
-      maPhong: values.maPhong || '',
-      tenPhong: values.tenPhong || '',
-      loaiPhong: values.loaiPhong || '',
-      nguoiPhuTrach: values.nguoiPhuTrach || '',
-    });
-    message.success('Tìm kiếm thành công!');
-  };
-
-  const handleResetSearch = () => {
-    searchForm.resetFields();
-    setSearchParams({});
-    message.info('Đã reset tiêu chí tìm kiếm');
-  };
+  const [searchMaPhong, setSearchMaPhong] = useState('');
+  const [searchTenPhong, setSearchTenPhong] = useState('');
+  const [filterLoaiPhong, setFilterLoaiPhong] = useState<RoomType | undefined>();
+  const [filterNguoiPhuTrach, setFilterNguoiPhuTrach] = useState<string | undefined>();
 
   const filteredData = useMemo(() => {
-    return dataSource.filter(item => {
-      if (searchParams.maPhong && !item.maPhong.toLowerCase().includes(searchParams.maPhong.toLowerCase())) {
-        return false;
-      }
-      if (searchParams.tenPhong && !item.tenPhong.toLowerCase().includes(searchParams.tenPhong.toLowerCase())) {
-        return false;
-      }
-      if (searchParams.loaiPhong && item.loaiPhong !== searchParams.loaiPhong) {
-        return false;
-      }
-      if (searchParams.nguoiPhuTrach && item.nguoiPhuTrach !== searchParams.nguoiPhuTrach) {
-        return false;
-      }
-      return true;
+    return data.filter((item) => {
+      const byMa = item.maPhong.toLowerCase().includes(searchMaPhong.trim().toLowerCase());
+      const byTen = item.tenPhong.toLowerCase().includes(searchTenPhong.trim().toLowerCase());
+      const byLoai = !filterLoaiPhong || item.loaiPhong === filterLoaiPhong;
+      const byNguoi = !filterNguoiPhuTrach || item.nguoiPhuTrach === filterNguoiPhuTrach;
+      return byMa && byTen && byLoai && byNguoi;
     });
-  }, [dataSource, searchParams]);
+  }, [data, filterLoaiPhong, filterNguoiPhuTrach, searchMaPhong, searchTenPhong]);
 
-  const statistics = useMemo(() => {
-    const total = dataSource.length;
-    const lyThuyet = dataSource.filter(item => item.loaiPhong === 'Lý thuyết').length;
-    const thucHanh = dataSource.filter(item => item.loaiPhong === 'Thực hành').length;
-    const hoiTruong = dataSource.filter(item => item.loaiPhong === 'Hội trường').length;
-    const tongChoNgoi = dataSource.reduce((sum, item) => sum + item.soChoNgoi, 0);
-    return { total, lyThuyet, thucHanh, hoiTruong, tongChoNgoi };
-  }, [dataSource]);
-
-  const renderLoaiPhongBadge = (loaiPhong: string) => {
-    const badgeColors: { [key: string]: string } = {
-      'Lý thuyết': 'blue',
-      'Thực hành': 'orange',
-      'Hội trường': 'red',
-    };
-    return <Badge color={badgeColors[loaiPhong]} text={loaiPhong} />;
+  const openAddModal = () => {
+    setEditingId(null);
+    form.resetFields();
+    setVisible(true);
   };
 
-  const renderChoNgoi = (soChoNgoi: number) => {
-    let status: 'success' | 'processing' | 'default' = 'default';
-    let label = 'Lớn';
-    if (soChoNgoi < 30) {
-      status = 'success';
-      label = 'Nhỏ';
-    } else if (soChoNgoi >= 30 && soChoNgoi < 60) {
-      status = 'processing';
-      label = 'Vừa';
+  const openEditModal = (record: Classroom) => {
+    setEditingId(record.id);
+    form.setFieldsValue({
+      maPhong: record.maPhong,
+      tenPhong: record.tenPhong,
+      soChoNgoi: record.soChoNgoi,
+      loaiPhong: record.loaiPhong,
+      nguoiPhuTrach: record.nguoiPhuTrach,
+    });
+    setVisible(true);
+  };
+
+  const handleDelete = (record: Classroom) => {
+    if (record.soChoNgoi >= 30) {
+      message.warning('Chỉ cho phép xóa phòng dưới 30 chỗ ngồi');
+      return;
     }
-    return <Tag icon={<HomeOutlined />} color={status}>{label} ({soChoNgoi})</Tag>;
+    setData((prev) => prev.filter((item) => item.id !== record.id));
+    message.success('Xóa phòng học thành công');
   };
 
-  const columns: ProColumns<PhongHoc>[] = [
-    {
-      title: 'Mã phòng',
-      dataIndex: 'maPhong',
-      width: 120,
-      sorter: (a, b) => a.maPhong.localeCompare(b.maPhong),
-    },
-    {
-      title: 'Tên phòng',
-      dataIndex: 'tenPhong',
-      width: 250,
-      ellipsis: true,
-    },
-    {
-      title: 'Loại phòng',
-      dataIndex: 'loaiPhong',
-      valueType: 'select',
-      valueEnum: loaiPhongEnum,
-      width: 150,
-      render: (_, record) => renderLoaiPhongBadge(record.loaiPhong),
-    },
-    {
-      title: 'Số chỗ ngồi',
-      dataIndex: 'soChoNgoi',
-      sorter: (a, b) => a.soChoNgoi - b.soChoNgoi,
-      hideInSearch: true,
-      width: 150,
-      render: (_, record) => renderChoNgoi(record.soChoNgoi),
-    },
-    {
-      title: 'Người phụ trách',
-      dataIndex: 'nguoiPhuTrach',
-      valueType: 'select',
-      valueEnum: danhSachNguoiPhuTrach,
-      width: 200,
-    },
-    {
-      title: 'Thao tác',
-      valueType: 'option',
-      width: 150,
-      fixed: 'right',
-      render: (_, record) => [
-        <Button
-          key="edit"
-          type="link"
-          icon={<EditOutlined />}
-          onClick={() => handleOpenModal(record)}
-        >
-          Sửa
-        </Button>,
-        record.soChoNgoi < 30 ? (
-          <Popconfirm
-            key="delete"
-            title="Bạn có chắc chắn muốn xóa phòng học này?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Xóa"
-            cancelText="Hủy"
-            okButtonProps={{ danger: true }}
-          >
-            <Button type="link" danger icon={<DeleteOutlined />}>
-              Xóa
-            </Button>
-          </Popconfirm>
-        ) : (
-          <Tooltip key="delete-disabled" title="Chỉ được phép xóa phòng dưới 30 chỗ ngồi">
-            <Button type="link" danger disabled icon={<DeleteOutlined />}>
-              Xóa
-            </Button>
-          </Tooltip>
-        ),
-      ],
-    },
-  ];
+  const handleSubmit = async () => {
+    const values = await form.validateFields();
 
-  const loaiPhongOptions = Object.keys(loaiPhongEnum).map(key => ({ label: key, value: key }));
-  const nguoiPhuTrachOptions = Object.keys(danhSachNguoiPhuTrach).map(key => ({ label: key, value: key }));
+    const normalizedMa = values.maPhong.trim().toLowerCase();
+    const normalizedTen = values.tenPhong.trim().toLowerCase();
 
-  const handleExportCsv = () => {
-    if (dataSource.length === 0) {
-      message.warning('Không có dữ liệu để xuất!');
+    const duplicatedMa = data.some(
+      (item) => item.id !== editingId && item.maPhong.trim().toLowerCase() === normalizedMa,
+    );
+    if (duplicatedMa) {
+      form.setFields([{ name: 'maPhong', errors: ['Mã phòng đã tồn tại'] }]);
       return;
     }
 
-    const headers = ['Mã phòng', 'Tên phòng', 'Loại phòng', 'Số chỗ ngồi', 'Người phụ trách'];
-    const csvContent = [
-      headers.join(','),
-      ...dataSource.map(item =>
-        [item.maPhong, item.tenPhong, item.loaiPhong, item.soChoNgoi, item.nguoiPhuTrach]
-          .map(field => "${field}")
-          .join(',')
-      )
-    ].join('\n');
+    const duplicatedTen = data.some(
+      (item) => item.id !== editingId && item.tenPhong.trim().toLowerCase() === normalizedTen,
+    );
+    if (duplicatedTen) {
+      form.setFields([{ name: 'tenPhong', errors: ['Tên phòng đã tồn tại'] }]);
+      return;
+    }
 
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csvContent));
-    element.setAttribute('download', Danh_sach_phong_hoc_${new Date().toISOString().split('T')[0]}.csv);
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-    message.success('Xuất danh sách phòng học thành công!');
+    if (editingId) {
+      setData((prev) =>
+        prev.map((item) => (item.id === editingId ? { ...item, ...values, maPhong: values.maPhong.trim(), tenPhong: values.tenPhong.trim() } : item)),
+      );
+      message.success('Cập nhật phòng học thành công');
+    } else {
+      setData((prev) => [
+        ...prev,
+        {
+          ...values,
+          id: Date.now().toString(),
+          maPhong: values.maPhong.trim(),
+          tenPhong: values.tenPhong.trim(),
+        },
+      ]);
+      message.success('Thêm mới phòng học thành công');
+    }
+
+    setVisible(false);
+    form.resetFields();
+    setEditingId(null);
   };
 
   return (
-    <PageContainer>
-      {/* Phần thống kê */}
-      <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <HomeOutlined style={{ fontSize: 32, color: '#1890ff', marginBottom: 8 }} />
-              <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1890ff' }}>{statistics.total}</div>
-              <div style={{ fontSize: 12, color: '#666' }}>Tổng phòng học</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 24, fontWeight: 'bold', color: '#1890ff' }}>{statistics.lyThuyet}</div>
-              <div style={{ fontSize: 12, color: '#666' }}>Phòng Lý thuyết</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 24, fontWeight: 'bold', color: '#faad14' }}>{statistics.thucHanh}</div>
-              <div style={{ fontSize: 12, color: '#666' }}>Phòng Thực hành</div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 24, fontWeight: 'bold', color: '#f5222d' }}>{statistics.hoiTruong}</div>
-              <div style={{ fontSize: 12, color: '#666' }}>Hội trường</div>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-
-      <Card style={{ marginBottom: 24 }}>
-        <Form
-          form={searchForm}
-          layout="vertical"
-        >
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} lg={6}>
-              <Form.Item
-                name="maPhong"
-                label="Mã phòng"
-              >
-                <Input placeholder="Nhập mã phòng..." />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Form.Item
-                name="tenPhong"
-                label="Tên phòng"
-              >
-                <Input placeholder="Nhập tên phòng..." />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Form.Item
-                name="loaiPhong"
-                label="Loại phòng"
-              >
-                <Select 
-                  placeholder="Chọn loại phòng..."
-                  options={loaiPhongOptions}
-                  allowClear
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={12} lg={6}>
-              <Form.Item
-                name="nguoiPhuTrach"
-                label="Người phụ trách"
-              >
-                <Select 
-                  placeholder="Chọn người phụ trách..."
-                  options={nguoiPhuTrachOptions}
-                  allowClear
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={[12, 12]}>
-            <Col>
-              <Button type="primary" onClick={handleSearch}>
-                Tìm kiếm
-              </Button>
-            </Col>
-            <Col>
-              <Button onClick={handleResetSearch}>
-                Làm lại
-              </Button>
-            </Col>
-            <Col>
-              <span style={{ fontSize: 12, color: '#999' }}>
-                Tìm thấy: <strong>{filteredData.length}</strong> kết quả
-              </span>
-            </Col>
-          </Row>
-        </Form>
-      </Card>
-
-      {filteredData.length === 0 ? (
-        <Card>
-          <Empty 
-            description={Object.keys(searchParams).some(key => searchParams[key as keyof typeof searchParams]) ? "Không tìm thấy phòng học phù hợp" : "Không có dữ liệu phòng học"}
-            style={{ marginTop: 48, marginBottom: 48 }}
-          >
-            <Button 
-              type="primary" 
-              icon={<PlusOutlined />}
-              onClick={() => handleOpenModal()}
-            >
-              Thêm phòng học mới
-            </Button>
-          </Empty>
-        </Card>
-      ) : (
-        <ProTable<PhongHoc>
-          headerTitle={`Danh sách phòng học (${filteredData.length})`}
-          columns={columns}
-          dataSource={filteredData}
-          rowKey="id"
-          pagination={{ pageSize: 10, showSizeChanger: true }}
-          search={false}
-          toolBarRender={() => [
-            <Button
-              key="button"
-              icon={<PlusOutlined />}
-              type="primary"
-              onClick={() => handleOpenModal()}
-            >
-              Thêm mới
-            </Button>,
-          ]}
+    <Card
+      title="Quản lý phòng học"
+      extra={
+        <Button icon={<PlusOutlined />} onClick={openAddModal} type="primary">
+          Thêm phòng học
+        </Button>
+      }
+    >
+      <Space style={{ width: '100%', marginBottom: 16 }} wrap>
+        <Input
+          allowClear
+          onChange={(e) => setSearchMaPhong(e.target.value)}
+          placeholder="Tìm theo mã phòng"
+          style={{ width: 220 }}
+          value={searchMaPhong}
         />
-      )}
+        <Input
+          allowClear
+          onChange={(e) => setSearchTenPhong(e.target.value)}
+          placeholder="Tìm theo tên phòng"
+          style={{ width: 220 }}
+          value={searchTenPhong}
+        />
+        <Select
+          allowClear
+          onChange={(value) => setFilterLoaiPhong(value)}
+          options={ROOM_TYPE_OPTIONS}
+          placeholder="Lọc loại phòng"
+          style={{ width: 180 }}
+          value={filterLoaiPhong}
+        />
+        <Select
+          allowClear
+          onChange={(value) => setFilterNguoiPhuTrach(value)}
+          options={RESPONSIBLES.map((item) => ({ label: item, value: item }))}
+          placeholder="Lọc người phụ trách"
+          style={{ width: 220 }}
+          value={filterNguoiPhuTrach}
+        />
+      </Space>
+
+      <Table<Classroom>
+        columns={[
+          { title: 'Mã phòng', dataIndex: 'maPhong' },
+          { title: 'Tên phòng', dataIndex: 'tenPhong' },
+          {
+            title: 'Số chỗ ngồi',
+            dataIndex: 'soChoNgoi',
+            sorter: (a, b) => a.soChoNgoi - b.soChoNgoi,
+            defaultSortOrder: 'ascend',
+            align: 'center',
+          },
+          {
+            title: 'Loại phòng',
+            dataIndex: 'loaiPhong',
+            render: (value: RoomType) => <Tag color="blue">{ROOM_TYPE_LABEL[value]}</Tag>,
+          },
+          { title: 'Người phụ trách', dataIndex: 'nguoiPhuTrach' },
+          {
+            title: 'Thao tác',
+            align: 'center',
+            render: (_, record) => {
+              const canDelete = record.soChoNgoi < 30;
+              return (
+                <Space>
+                  <Tooltip title="Chỉnh sửa">
+                    <Button icon={<EditOutlined />} onClick={() => openEditModal(record)} type="link" />
+                  </Tooltip>
+
+                  {canDelete ? (
+                    <Popconfirm
+                      onConfirm={() => handleDelete(record)}
+                      title="Bạn có chắc chắn muốn xóa phòng học này?"
+                    >
+                      <Button danger icon={<DeleteOutlined />} type="link" />
+                    </Popconfirm>
+                  ) : (
+                    <Tooltip title="Chỉ cho phép xóa phòng dưới 30 chỗ ngồi">
+                      <Button danger disabled icon={<DeleteOutlined />} type="link" />
+                    </Tooltip>
+                  )}
+                </Space>
+              );
+            },
+          },
+        ]}
+        dataSource={filteredData}
+        pagination={{ pageSize: 10 }}
+        rowKey="id"
+      />
 
       <Modal
-        title={
-          <Space>
-            <HomeOutlined />
-            {currentRow ? 'Chỉnh sửa phòng học' : 'Thêm mới phòng học'}
-          </Space>
-        }
-        open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        onOk={() => form.submit()}
         destroyOnClose
-        okText="Lưu lại"
-        cancelText="Hủy"
-        width={600}
+        onCancel={() => {
+          setVisible(false);
+          setEditingId(null);
+          form.resetFields();
+        }}
+        onOk={handleSubmit}
+        visible={visible}
+        okText={editingId ? 'Lưu lại' : 'Thêm mới'}
+        title={editingId ? 'Chỉnh sửa phòng học' : 'Thêm phòng học'}
       >
-        <Divider style={{ margin: '12px 0' }} />
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleFinish}
-        >
+        <Form form={form} layout="vertical">
           <Form.Item
+            label="Mã phòng"
             name="maPhong"
-            label={
-              <Tooltip title="Mã định danh phòng (chữ/số, tối đa 10 ký tự)">
-                <span>Mã phòng <span style={{ color: 'red' }}>*</span></span>
-              </Tooltip>
-            }
             rules={[
-              { required: true, message: 'Vui lòng nhập mã phòng!' },
-              { max: 10, message: 'Mã phòng không được vượt quá 10 ký tự!' },
-              { pattern: /^[a-zA-Z0-9]+$/, message: 'Mã phòng chỉ được chứa chữ và số, không có khoảng trắng!' },
-              { validator: (rule, value) => checkTrungLap(rule, value, 'maPhong') },
+              { required: true, message: 'Vui lòng nhập mã phòng' },
+              { whitespace: true, message: 'Mã phòng không được để trống' },
+              { max: 10, message: 'Mã phòng tối đa 10 ký tự' },
             ]}
           >
-            <Input placeholder="VD: P101, LAB01, HT001" />
+            <Input maxLength={10} placeholder="Nhập mã phòng" />
           </Form.Item>
 
           <Form.Item
+            label="Tên phòng"
             name="tenPhong"
-            label={
-              <Tooltip title="Tên gọi của phòng học">
-                <span>Tên phòng <span style={{ color: 'red' }}>*</span></span>
-              </Tooltip>
-            }
             rules={[
-              { required: true, message: 'Vui lòng nhập tên phòng!' },
-              { max: 50, message: 'Tên phòng không được vượt quá 50 ký tự!' },
-              { validator: (rule, value) => checkTrungLap(rule, value, 'tenPhong') },
+              { required: true, message: 'Vui lòng nhập tên phòng' },
+              { whitespace: true, message: 'Tên phòng không được để trống' },
+              { max: 50, message: 'Tên phòng tối đa 50 ký tự' },
             ]}
           >
-            <Input placeholder="VD: Phòng 101, Phòng Thực hành Máy tính A" />
+            <Input maxLength={50} placeholder="Nhập tên phòng" />
           </Form.Item>
 
           <Form.Item
-            name="loaiPhong"
-            label={
-              <Tooltip title="Phòng dùng để dạy lý thuyết, thực hành hoặc tổ chức sự kiện">
-                <span>Loại phòng <span style={{ color: 'red' }}>*</span></span>
-              </Tooltip>
-            }
-            rules={[{ required: true, message: 'Vui lòng chọn loại phòng!' }]}
-          >
-            <Select 
-              options={loaiPhongOptions} 
-              placeholder="Chọn loại phòng..."
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="soChoNgoi"
-            label={
-              <Tooltip title="Số lượng chỗ ngồi (10-200)">
-                <span>Số chỗ ngồi <span style={{ color: 'red' }}>*</span></span>
-              </Tooltip>
-            }
-            rules={[
-              { required: true, message: 'Vui lòng nhập số chỗ ngồi!' },
-            ]}
-          >
-            <InputNumber 
-              min={10} 
-              max={200} 
-              style={{ width: '100%' }} 
-              placeholder="Nhập 10 - 200" 
-            />
-          </Form.Item>
-
-          <Form.Item
+            label="Người phụ trách"
             name="nguoiPhuTrach"
-            label={
-              <Tooltip title="Người quản lý/chịu trách nhiệm phòng">
-                <span>Người phụ trách <span style={{ color: 'red' }}>*</span></span>
-              </Tooltip>
-            }
-            rules={[{ required: true, message: 'Vui lòng chọn người phụ trách!' }]}
+            rules={[{ required: true, message: 'Vui lòng chọn người phụ trách' }]}
           >
-            <Select 
-              options={nguoiPhuTrachOptions} 
-              placeholder="Chọn người phụ trách..." 
-            />
+            <Select options={RESPONSIBLES.map((item) => ({ label: item, value: item }))} placeholder="Chọn người phụ trách" />
+          </Form.Item>
+
+          <Form.Item
+            label="Số chỗ ngồi"
+            name="soChoNgoi"
+            rules={[
+              { required: true, message: 'Vui lòng nhập số chỗ ngồi' },
+              { type: 'number', min: 10, max: 200, message: 'Số chỗ ngồi từ 10 đến 200' },
+            ]}
+          >
+            <InputNumber min={10} max={200} style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item
+            label="Loại phòng"
+            name="loaiPhong"
+            rules={[{ required: true, message: 'Vui lòng chọn loại phòng' }]}
+          >
+            <Select options={ROOM_TYPE_OPTIONS} placeholder="Chọn loại phòng" />
           </Form.Item>
         </Form>
       </Modal>
-    </PageContainer>
+    </Card>
   );
 };
 
-export default QuanLyPhongHoc;
+export default PhongHocPage;

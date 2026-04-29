@@ -105,6 +105,13 @@
 		icon: 'ReadOutlined',
 		component: './BlogCaNhan',  // ← Sửa thành tên folder mới
 	},
+	{
+		path: '/ung-dung-the-duc',
+		name: 'UngDungTheDuc',
+		icon: 'HeartOutlined',
+		component: './ungdungtheduc',  // ← Thêm 'dung' vào
+	},
+
 
 	// DANH MUC HE THONG
 	// {
