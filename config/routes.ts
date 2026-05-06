@@ -111,6 +111,12 @@
 		icon: 'HeartOutlined',
 		component: './ungdungtheduc',  // ← Thêm 'dung' vào
 	},
+	{
+		path: '/quan-ly-cong-viec',
+		name: 'Quản lý công việc',
+		icon: 'ProjectOutlined',
+		component: './quanlycongviec',
+	},
 
 
 	// DANH MUC HE THONG
